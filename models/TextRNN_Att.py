@@ -21,13 +21,13 @@ class Config(object):
         self.embedding_pretrained = torch.tensor(
             np.load(dataset + '/data/' + embedding)["embeddings"].astype('float32'))\
             if embedding != 'random' else None                                       # 预训练词向量
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   # 设备
+        self.device = torch.device('cpu')   # 设备
 
         self.dropout = 0.5                                              # 随机失活
         self.require_improvement = 1000                                 # 若超过1000batch效果还没提升，则提前结束训练
         self.num_classes = len(self.class_list)                         # 类别数
         self.n_vocab = 0                                                # 词表大小，在运行时赋值
-        self.num_epochs = 10                                            # epoch数
+        self.num_epochs = 50                                            # epoch数
         self.batch_size = 128                                           # mini-batch大小
         self.pad_size = 32                                              # 每句话处理成的长度(短填长切)
         self.learning_rate = 1e-3                                       # 学习率

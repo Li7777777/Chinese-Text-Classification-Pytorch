@@ -6,7 +6,7 @@ import pickle as pkl
 from tqdm import tqdm
 import time
 from datetime import timedelta
-
+import jieba
 
 MAX_VOCAB_SIZE = 10000
 UNK, PAD = '<UNK>', '<PAD>'
@@ -30,7 +30,7 @@ def build_vocab(file_path, tokenizer, max_size, min_freq):
 
 def build_dataset(config, ues_word):
     if ues_word:
-        tokenizer = lambda x: x.split(' ')  # 以空格隔开，word-level
+        tokenizer = lambda x: list(jieba.cut(x))  # 以空格隔开，word-level
     else:
         tokenizer = lambda x: [y for y in x]  # char-level
     if os.path.exists(config.vocab_path):
@@ -150,10 +150,10 @@ def get_time_dif(start_time):
 
 if __name__ == "__main__":
     '''提取预训练词向量'''
-    vocab_dir = "./THUCNews/data/vocab.pkl"
-    pretrain_dir = "./THUCNews/data/sgns.sogou.char"
+    vocab_dir = "./CHIP-CDN/data/vocab.pkl"
+    pretrain_dir = "./CHIP-CDN/data/Medical.txt"
     emb_dim = 300
-    filename_trimmed_dir = "./THUCNews/data/vocab.embedding.sougou"
+    filename_trimmed_dir = "./CHIP-CDN/data/vocab.embedding.medical"
     word_to_id = pkl.load(open(vocab_dir, 'rb'))
     embeddings = np.random.rand(len(word_to_id), emb_dim)
     f = open(pretrain_dir, "r", encoding='UTF-8')

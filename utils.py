@@ -6,7 +6,7 @@ import pickle as pkl
 from tqdm import tqdm
 import time
 from datetime import timedelta
-
+import jieba
 
 MAX_VOCAB_SIZE = 10000  # 词表长度限制
 UNK, PAD = '<UNK>', '<PAD>'  # 未知字，padding符号
@@ -30,7 +30,7 @@ def build_vocab(file_path, tokenizer, max_size, min_freq):
 
 def build_dataset(config, ues_word):
     if ues_word:
-        tokenizer = lambda x: x.split(' ')  # 以空格隔开，word-level
+        tokenizer = lambda x: list(jieba.cut(x))  # 以空格隔开，word-level
     else:
         tokenizer = lambda x: [y for y in x]  # char-level
     if os.path.exists(config.vocab_path):
@@ -74,7 +74,7 @@ class DatasetIterater(object):
         self.batches = batches
         self.n_batches = len(batches) // batch_size
         self.residue = False  # 记录batch数量是否为整数
-        if len(batches) % self.n_batches != 0:
+        if len(batches) % batch_size != 0:
             self.residue = True
         self.index = 0
         self.device = device
@@ -128,16 +128,16 @@ def get_time_dif(start_time):
 if __name__ == "__main__":
     '''提取预训练词向量'''
     # 下面的目录、文件名按需更改。
-    train_dir = "./THUCNews/data/train.txt"
-    vocab_dir = "./THUCNews/data/vocab.pkl"
-    pretrain_dir = "./THUCNews/data/sgns.sogou.char"
+    train_dir = "./CHIP-CDN/data/train.txt"
+    vocab_dir = "./CHIP-CDN/data/vocab.pkl"
+    pretrain_dir = "./CHIP-CDN/data/Medical.txt"
     emb_dim = 300
-    filename_trimmed_dir = "./THUCNews/data/embedding_SougouNews"
+    filename_trimmed_dir = "./CHIP-CDN/data/embedding_medical"
     if os.path.exists(vocab_dir):
         word_to_id = pkl.load(open(vocab_dir, 'rb'))
     else:
-        # tokenizer = lambda x: x.split(' ')  # 以词为单位构建词表(数据集中词之间以空格隔开)
-        tokenizer = lambda x: [y for y in x]  # 以字为单位构建词表
+        tokenizer = lambda x: list(jieba.cut(x))  # 以词为单位构建词表(数据集中词之间以空格隔开)
+        # tokenizer = lambda x: [y for y in x]  # 以字为单位构建词表
         word_to_id = build_vocab(train_dir, tokenizer=tokenizer, max_size=MAX_VOCAB_SIZE, min_freq=1)
         pkl.dump(word_to_id, open(vocab_dir, 'wb'))
 
